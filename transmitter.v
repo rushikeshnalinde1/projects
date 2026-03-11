@@ -15,16 +15,15 @@ reg [7:0] data;
 reg [2:0] index;
 reg [1:0] state = 2'b11;
 
-always @(posedge clk or posedge rst)
+always @(posedge clk)
 	begin
 	  if(rst)
-	    begin
 		tx <= 1'b1;
-		state <= idle_state;
-	    end
-	  else
-	    begin
-		case(state)
+	end
+
+always @(posedge clk)
+	begin
+	  case(state)
 
 		idle_state : 
 		  begin
@@ -53,13 +52,11 @@ always @(posedge clk or posedge rst)
 		  begin
 			if(enb)
 			  begin
-				
-				tx <= data[index];
-				
 				if(index == 3'h7)
 					state <= stop_state;
 				else 
 					index <= index + 1;
+					tx <= data[index];
 			end
 		  end
 
@@ -78,8 +75,6 @@ always @(posedge clk or posedge rst)
 			state<=idle_state;
 		  end
 	endcase
-
-	    end
 end
 
 assign busy = (state != idle_state);
